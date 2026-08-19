@@ -1,0 +1,14 @@
+{
+  "name": "ai-website-builder",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "concurrently \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+    "install:all": "npm install --prefix server && npm install --prefix client",
+    "test": "npm test --prefix server",
+    "build": "npm run build --prefix client",
+    "db:generate": "npm run prisma:generate --prefix server",
+    "db:migrate": "npm run prisma:migrate --prefix server"
+  },
+  "devDependencies": { "concurrently": "^9.1.2" }
+}

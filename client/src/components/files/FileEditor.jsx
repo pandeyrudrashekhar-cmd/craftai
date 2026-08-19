@@ -1,0 +1,11 @@
+import { lazy, Suspense, useEffect, useState } from 'react';
+import { LoaderCircle, Save } from 'lucide-react';
+
+const Editor = lazy(() => import('@monaco-editor/react'));
+const languageFor = (path) => path.endsWith('.jsx') ? 'javascript' : path.endsWith('.js') ? 'javascript' : path.endsWith('.css') ? 'css' : path.endsWith('.json') ? 'json' : 'plaintext';
+export default function FileEditor({ file, loading, saving, onSave }) { const [content, setContent] = useState(''); const [dirty, setDirty] = useState(false);
+  useEffect(() => { setContent(file?.content ?? ''); setDirty(false); }, [file?.id, file?.content]);
+  if (loading) return <section className="grid min-h-0 place-items-center"><LoaderCircle className="animate-spin text-violet-400" /></section>;
+  if (!file) return <section className="grid min-h-0 place-items-center p-8 text-center text-sm text-slate-500">Select a file from the explorer to edit it.</section>;
+  const save = async () => { await onSave(content); setDirty(false); };
+  return <section className="flex min-h-0 flex-col bg-[#0b0f18]"><header className="flex items-center justify-between border-b border-white/10 bg-slate-900/70 px-4 py-2.5"><div className="min-w-0"><p className="section-label">Source file</p><span className="mt-1 block truncate font-mono text-xs text-slate-300">{file.path}</span></div><button onClick={save} disabled={!dirty || saving} className="inline-flex items-center gap-1.5 rounded-lg border border-violet-300/20 bg-violet-500/15 px-3 py-1.5 text-xs font-medium text-violet-100 hover:bg-violet-500/25 disabled:border-white/5 disabled:bg-slate-800 disabled:text-slate-500">{saving ? <LoaderCircle size={14} className="animate-spin" /> : <Save size={14} />}{saving ? 'Saving' : dirty ? 'Save changes' : 'Saved'}</button></header><div className="min-h-0 flex-1"><Suspense fallback={<div className="grid h-full place-items-center"><LoaderCircle className="animate-spin text-violet-400" /></div>}><Editor height="100%" language={languageFor(file.path)} value={content} theme="vs-dark" onChange={(value) => { setContent(value ?? ''); setDirty(value !== file.content); }} options={{ minimap: { enabled: false }, fontSize: 13, padding: { top: 18 }, automaticLayout: true }} /></Suspense></div></section>; }

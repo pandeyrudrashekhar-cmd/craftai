@@ -1,0 +1,2 @@
+export function notFound(request, response) { response.status(404).json({ error: `Route ${request.method} ${request.path} was not found.` }); }
+export function errorHandler(error, request, response, next) { const status = error.statusCode ?? 500; if (status >= 500) console.error(error); response.status(status).json({ error: error.isOperational ? error.message : 'An unexpected error occurred.' }); }

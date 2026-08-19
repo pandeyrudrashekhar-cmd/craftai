@@ -1,0 +1,2 @@
+-- The existing File table already has the required project relation, unique path
+-- constraint, and cascade behavior. Prisma now exposes it as ProjectFile via @@map.

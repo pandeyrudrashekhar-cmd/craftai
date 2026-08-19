@@ -1,0 +1,1 @@
+ALTER TYPE "DeploymentTarget" ADD VALUE 'NETLIFY';

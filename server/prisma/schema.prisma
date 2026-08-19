@@ -1,0 +1,196 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  name          String
+  email         String   @unique
+  passwordHash  String
+  projects      Project[]
+  githubConnection GitHubConnection?
+  githubOAuthStates GitHubOAuthState[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model GitHubOAuthState {
+  id        String   @id @default(cuid())
+  stateHash String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model GitHubConnection {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  githubUserId  String   @unique
+  username      String
+  accessToken   String   @db.Text
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([userId])
+  @@index([githubUserId])
+}
+
+model Project {
+  id          String           @id @default(cuid())
+  title       String
+  description String?
+  thumbnail   String?
+  framework   String           @default("React")
+  status      ProjectStatus    @default(DRAFT)
+  userId      String
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chats       Chat[]
+  files       ProjectFile[]
+  versions    VersionHistory[]
+  deployments Deployment[]
+  conversations Conversation[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  @@index([userId, updatedAt])
+}
+
+model Conversation {
+  id        String    @id @default(cuid())
+  projectId String
+  project   Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  messages  Message[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  @@index([projectId, updatedAt])
+}
+
+model Message {
+  id             String      @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  role           MessageRole
+  content        String      @db.Text
+  createdAt      DateTime    @default(now())
+  @@index([conversationId, createdAt])
+}
+
+model Chat {
+  id        String   @id @default(cuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  role      ChatRole
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  @@index([projectId, createdAt])
+}
+
+model ProjectFile {
+  id        String   @id @default(cuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  path      String
+  content   String   @db.Text
+  language  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@unique([projectId, path])
+  @@index([projectId])
+  @@map("File")
+}
+
+model VersionHistory {
+  id        String   @id @default(cuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  label     String?
+  snapshot  Json
+  createdAt DateTime @default(now())
+  @@index([projectId, createdAt])
+}
+
+model Deployment {
+  id            String           @id @default(cuid())
+  projectId     String
+  project       Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  provider      DeploymentTarget
+  status        DeploymentStatus @default(PENDING)
+  url           String?
+  externalId    String?
+  errorMessage  String?
+  attemptCount  Int              @default(0)
+  lastAttemptAt DateTime?
+  startedAt     DateTime?
+  completedAt   DateTime?
+  customDomain  CustomDomain?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  @@index([projectId, createdAt])
+}
+
+model CustomDomain {
+  id           String              @id @default(cuid())
+  deploymentId String              @unique
+  deployment   Deployment          @relation(fields: [deploymentId], references: [id], onDelete: Cascade)
+
+  domain       String              @unique
+  status       DomainStatus        @default(PENDING)
+
+  verificationType   String?
+  verificationValue  String?
+
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+
+  @@index([domain])
+}
+
+enum ChatRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
+enum DeploymentTarget {
+  VERCEL
+  NETLIFY
+  RAILWAY
+  OTHER
+}
+
+enum DeploymentStatus {
+  PENDING
+  BUILDING
+  READY
+  FAILED
+}
+
+enum ProjectStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
+enum DomainStatus {
+  PENDING
+  VERIFYING
+  VERIFIED
+  FAILED
+}
