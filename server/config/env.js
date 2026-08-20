@@ -5,6 +5,11 @@ const required = [
     'JWT_SECRET'
 ];
 
+const configuredClientUrls = [
+    process.env.FRONTEND_URL,
+    process.env.CLIENT_URL
+].flatMap((value) => value ? value.split(',') : []).map((value) => value.trim()).filter(Boolean);
+
 export const env = {
     // Server
     port: Number(process.env.PORT ?? 4000),
@@ -13,7 +18,8 @@ export const env = {
 
     // Frontend URLs allowed by backend
     clientUrls: [
-        process.env.CLIENT_URL,
+        ...configuredClientUrls,
+        'https://craftai-frontend.onrender.com',
         'http://localhost:5173',
         'http://localhost:5174',
         'http://localhost:5175'

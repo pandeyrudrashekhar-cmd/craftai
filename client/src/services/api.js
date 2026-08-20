@@ -2,6 +2,12 @@ import axios from 'axios';
 import { useAuthStore } from '../store/authStore.js';
 
 const viteEnv = typeof import.meta !== 'undefined' ? import.meta.env : undefined;
+const configuredApiUrl = viteEnv?.VITE_API_URL?.trim();
+const productionApiUrl = 'https://craftai-backend-dy44.onrender.com/api';
+const isLocalApiUrl = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?(?:\/|$)/i.test(configuredApiUrl ?? '');
+const apiBaseUrl = viteEnv?.PROD && (!configuredApiUrl || isLocalApiUrl)
+  ? productionApiUrl
+  : configuredApiUrl ?? productionApiUrl;
 
 const api = axios.create({
   // Local development:
@@ -10,9 +16,7 @@ const api = axios.create({
   // Production:
   // If VITE_API_URL is not available on Render,
   // the live backend URL will be used.
-  baseURL:
-    viteEnv?.VITE_API_URL ??
-    'https://craftai-backend-dy44.onrender.com/api',
+  baseURL: apiBaseUrl,
 
   headers: {
     'Content-Type': 'application/json'
