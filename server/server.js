@@ -19,12 +19,12 @@ validateEnvironment();
 const app = express();
 app.disable('x-powered-by');
 app.use(helmet());
-app.use(cors({
+const corsOptions = {
     origin: (origin, callback) => {
         // Allow requests without an Origin
         // and requests from our frontend URLs
         if (!origin || env.clientUrls.includes(origin)) {
-            callback(null, true);
+            callback(null, origin || true);
         } else {
             callback(new Error('Not allowed by CORS'));
         }
@@ -35,7 +35,9 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization'],
 
     credentials: true
-}));
+};
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 app.use(express.json({ limit: '1mb' }));
 app.use('/api', rateLimit({ windowMs: 15 * 60 * 1000, limit: 300, standardHeaders: 'draft-7', legacyHeaders: false }));
 app.use('/api/auth', rateLimit({ windowMs: 15 * 60 * 1000, limit: 20, standardHeaders: 'draft-7', legacyHeaders: false }));

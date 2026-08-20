@@ -10,6 +10,8 @@ const configuredClientUrls = [
     process.env.CLIENT_URL
 ].flatMap((value) => value ? value.split(',') : []).map((value) => value.trim()).filter(Boolean);
 
+const normalizeClientUrl = (value) => value.replace(/\/+$/, '');
+
 export const env = {
     // Server
     port: Number(process.env.PORT ?? 4000),
@@ -24,7 +26,7 @@ export const env = {
     'http://localhost:5173',
     'http://localhost:5174',
     'http://localhost:5175'
-].filter(Boolean),
+].filter(Boolean).map(normalizeClientUrl),
 
     // Database
     databaseUrl: process.env.DATABASE_URL,
