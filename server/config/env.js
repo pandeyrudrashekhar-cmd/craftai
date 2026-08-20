@@ -18,12 +18,13 @@ export const env = {
 
     // Frontend URLs allowed by backend
     clientUrls: [
-        ...configuredClientUrls,
-        'https://craftai-frontend.onrender.com',
-        'http://localhost:5173',
-        'http://localhost:5174',
-        'http://localhost:5175'
-    ].filter(Boolean),
+    ...configuredClientUrls,
+    'https://craftai-frontend.vercel.app',
+    'https://craftai-frontend.onrender.com',
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'http://localhost:5175'
+].filter(Boolean),
 
     // Database
     databaseUrl: process.env.DATABASE_URL,
