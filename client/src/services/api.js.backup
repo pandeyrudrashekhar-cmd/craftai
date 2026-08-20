@@ -13,13 +13,6 @@ const configuredApiUrl = viteEnv?.VITE_API_URL?.trim();
 const productionApiUrl =
   'https://craftai-backend-dy44.onrender.com/api';
 
-const normalizeApiUrl = (url) => {
-  const normalizedUrl = url.replace(/\/+$/, '');
-  return normalizedUrl.endsWith('/api')
-    ? normalizedUrl
-    : `${normalizedUrl}/api`;
-};
-
 // Check whether the configured URL is localhost
 const isLocalApiUrl =
   /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?(?:\/|$)/i.test(
@@ -50,7 +43,7 @@ if (viteEnv?.PROD) {
   }
 } else {
   // Local development
-  apiBaseUrl = normalizeApiUrl(configuredApiUrl || productionApiUrl);
+  apiBaseUrl = configuredApiUrl || productionApiUrl;
 }
 
 // --------------------------------------------------
