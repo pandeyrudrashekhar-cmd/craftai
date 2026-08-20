@@ -21,13 +21,17 @@ app.disable('x-powered-by');
 app.use(helmet());
 const corsOptions = {
     origin: (origin, callback) => {
-        // Allow requests without an Origin
-        // and requests from our frontend URLs
-        if (!origin || env.clientUrls.includes(origin)) {
-            callback(null, origin || true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
+        // Requests without an Origin are not browser CORS requests.
+        if (!origin) {
+            callback(null, true);
+            return;
         }
+
+        const normalizedOrigin = origin.replace(/\/+$/, '');
+        callback(
+            null,
+            env.clientUrls.includes(normalizedOrigin) ? normalizedOrigin : false
+        );
     },
 
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
