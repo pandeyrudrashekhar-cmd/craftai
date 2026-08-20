@@ -17,7 +17,7 @@ export const env = {
     nodeEnv: process.env.NODE_ENV ?? 'development',
 
     // Frontend URLs allowed by backend
-    clientUrls: [
+   clientUrls: [
     ...configuredClientUrls,
     'https://craftai-frontend.vercel.app',
     'https://craftai-frontend.onrender.com',
