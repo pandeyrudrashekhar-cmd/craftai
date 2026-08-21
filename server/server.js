@@ -19,12 +19,11 @@ validateEnvironment();
 
 const app = express();
 
-// Render is behind a reverse proxy.
-// Trust the first proxy so Express can correctly read
-// X-Forwarded-For and rate limiting works properly.
+// Render/reverse proxy ke peeche Express chal raha hai
 app.set('trust proxy', 1);
 
 app.disable('x-powered-by');
+
 app.use(helmet());
 const corsOptions = {
     origin: (origin, callback) => {
