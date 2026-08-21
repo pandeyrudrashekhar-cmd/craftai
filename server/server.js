@@ -33,11 +33,15 @@ const corsOptions = {
             return;
         }
 
-        const normalizedOrigin = origin.replace(/\/+$/, '');
-        callback(
-            null,
-            env.clientUrls.includes(normalizedOrigin) ? normalizedOrigin : false
-        );
+       const normalizedOrigin = origin.replace(/\/+$/, '');
+
+const isAllowed =
+    env.clientUrls.includes(normalizedOrigin) ||
+    /^https:\/\/craftai-[a-z0-9-]+-pandeyrudrashekhar-2352s-projects\.vercel\.app$/.test(
+        normalizedOrigin
+    );
+
+callback(null, isAllowed ? normalizedOrigin : false);
     },
 
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
